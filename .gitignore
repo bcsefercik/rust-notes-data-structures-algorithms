@@ -1,2 +1,5 @@
 *.o
 *.DS_Store*
+
+rust_book/projects/hello_cargo/target/*
+rust_book/projects/guessing_game/target/*

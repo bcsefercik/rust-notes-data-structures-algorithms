@@ -6,6 +6,7 @@
 - [CH 1: Intro](#ch-1-intro)
 - [CH 2: Guessing Game](#ch-2-guessing-game)
 - [CH 3: Common Concepts](#ch-3-common-concepts)
+- [CH 4: Ownership](#ch-4-ownership)
 
 ## CH 1: Intro
 **Cargo**: Included dependency manager and build tool, makes adding, compiling, and managing dependencies painless and consistent across the Rust ecosystem.  
@@ -284,3 +285,22 @@ for number in (1..4).rev() {
 }
 ```
 - The safety and conciseness of for loops make them the most commonly used loop construct in Rust.
+
+
+
+## CH 4: Ownership
+- Ownership is Rust’s most unique feature, and it enables Rust to make memory safety guarantees without needing a garbage collector. Rust’s central feature is _ownership_. 
+- All programs have to manage the way they use a computer’s memory while running. Some languages have garbage collection that constantly looks for no longer used memory as the program runs; in other languages, the programmer must explicitly allocate and free the memory. Rust uses a third approach: memory is managed through a system of ownership with a set of rules that the compiler checks at compile time. None of the ownership features slow down your program while it’s running.
+
+> - In many programming languages, you don’t have to think about the stack and the heap very often. But in a systems programming language like Rust, whether a value is on the stack or the heap has more of an effect on how the language behaves and why you have to make certain decisions. 
+> - Both the stack and the heap are parts of memory that are available to your code to use at runtime, but they are structured in different ways. The stack stores values in the order it gets them and removes the values in the opposite order.
+> - All data stored on the stack must have a known, fixed size. Data with an unknown size at compile time or a size that might change must be stored on the heap instead. The heap is less organized: when you put data on the heap, you request a certain amount of space. The memory allocator finds an empty spot in the heap that is big enough, marks it as being in use, and returns a pointer, which is the address of that location. This process is called allocating on the heap and is sometimes abbreviated as just allocating. Pushing values onto the stack is not considered allocating. Because the pointer is a known, fixed size, you can store the pointer on the stack, but when you want the actual data, you must follow the pointer.
+> - Pushing to the stack is faster than allocating on the heap because the allocator never has to search for a place to store new data; that location is always at the top of the stack. Comparatively, allocating space on the heap requires more work, because the allocator must first find a big enough space to hold the data and then perform bookkeeping to prepare for the next allocation.
+> - Accessing data in the heap is slower than accessing data on the stack because you have to follow a pointer to get there. Contemporary processors are faster if they jump around less in memory.
+> - Keeping track of what parts of code are using what data on the heap, minimizing the amount of duplicate data on the heap, and cleaning up unused data on the heap so you don’t run out of space are all problems that ownership addresses.
+
+- Each value in Rust has a variable that’s called its owner.
+- There can only be one owner at a time.
+- When the owner goes out of scope, the value will be dropped.
+
+Left-off here: https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html#variable-scope

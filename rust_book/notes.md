@@ -1,5 +1,12 @@
 # The Rust Programming Language
 ## https://doc.rust-lang.org/book/title-page.html
+
+## Contents
+
+- [CH 1: Intro](#ch-1-intro)
+- [CH 2: Guessing Game](#ch-2-guessing-game)
+- [CH 3: Common Concepts](#ch-3-common-concepts)
+
 ## CH 1: Intro
 **Cargo**: Included dependency manager and build tool, makes adding, compiling, and managing dependencies painless and consistent across the Rust ecosystem.  
 **rustfmt**: A tool for formatting Rust code according to style guidelines. https://github.com/rust-lang/rustfmt  
@@ -85,3 +92,195 @@ A `match` expression is made up of _arms_. An arm consists of a _pattern_ and th
 - Shadowing: We create a variable named guess. But wait, doesn’t the program already have a variable named guess? It does, but Rust allows us to shadow the previous value of guess with a new one. This feature is often used in situations in which you want to convert a value from one type to another type. Shadowing lets us reuse the guess variable name rather than forcing us to create two unique variables, such as guess_str and guess for example. 
 
 - Error handling w/ `match` or `expect`.
+
+
+## CH 3: Common Concepts
+
+### Variables
+- Variables are _immutable_ by default.
+- `mut` conveys intent to future readers of the code by indicating that other parts of the code will be changing this variable’s value.
+```rust
+let x = 13;
+let mut y = 13;
+```
+
+### Constants
+
+```rust
+const MAX_POINTS: u32 = 100_000;
+```
+
+- Constants can be declared in any scope, including the global scope, which makes them useful for values that many parts of code need to know about.
+- The last difference is that constants may be set only to a constant expression, not the result of a function call or any other value that could only be computed at runtime.
+
+### Shadowing
+
+```rust
+let x = 5;
+
+let x = x + 1;
+
+let x = x * 2;
+```
+
+- You can declare a new variable with the same name as a previous variable. Rustaceans say that the first variable is shadowed by the second, which means that the second variable’s value is what appears when the variable is used. 
+- Shadowing is different from marking a variable as `mut`, because we’ll get a compile-time error if we accidentally try to reassign to this variable without using the `let` keyword. By using `let`, we can perform a few transformations on a value but have the variable be immutable after those transformations have been completed.
+- The other difference between `mut` and shadowing is that because we’re effectively creating a new variable when we use the `let` keyword again, we can change the type of the value but reuse the same name.
+
+### Data Types
+- We’ll look at two data type subsets: _scalar_ and _compound_.
+- The compiler can usually infer what type we want to use based on the value and how we use it. In cases when many types are possible
+
+#### Scalar Types
+- _integers, floating-point numbers, Booleans, and characters_. 
+- Each *integer* variant can be either signed or unsigned and has an explicit size. Signed and unsigned refer to whether it’s possible for the number to be negative—in other words, whether the number needs to have a sign with it (signed) or whether it will only ever be positive and can therefore be represented without a sign (unsigned). It’s like writing numbers on paper: when the sign matters, a number is shown with a plus sign or a minus sign; however, when it’s safe to assume the number is positive, it’s shown with no sign. Signed numbers are stored using two’s complement representation. _i8, u8, i16, u16, i32, u32, i64, u64, i128, u128, isize, usize_
+- So how do you know which type of integer to use? If you’re unsure, Rust’s defaults are generally good choices, and integer types default to i32: this type is generally the fastest, even on 64-bit systems. The primary situation in which you’d use isize or usize is when indexing some sort of collection.
+
+
+- *floating-point types*: f32, f64
+- The default type is f64 because on modern CPUs it’s roughly the same speed as f32 but is capable of more precision.
+
+- *boolean-type*: bool (1 byte)
+
+- *char type*: char (4 bytes), unicode scalar vbalue
+- `char` literals are specified with single quotes, as opposed to string literals, which use double quotes.
+
+
+#### Compound Types
+- *tuple type*
+```rust
+let tup: (i32, f64, u8) = (500, 6.4, 1);
+let (x, y, z) = tup;  // destructuring
+
+let five_hundred = x.0;
+let six_point_four = x.1;let six_point_four = x.1;
+```
+
+- *array type*
+- Unlike a tuple, every element of an array must have the same type. Arrays in Rust are different from arrays in some other languages because arrays in Rust have a fixed length, like tuples.
+- Arrays are useful when you want your data allocated on the stack rather than the heap or when you want to ensure you always have a fixed number of elements. 
+```rust
+let a = [1, 2, 3, 4, 5];
+let a: [i32; 5] = [1, 2, 3, 4, 5];
+
+let a = [3; 5];  // same as: let a = [3, 3, 3, 3, 3];
+
+let first = a[0];
+```
+
+- The program will result in a _runtime error_ if we try to access invalid index in an array. This is the first example of Rust’s safety principles in action. In many low-level languages, this kind of check is not done, and when you provide an incorrect index, invalid memory can be accessed. Rust protects you against this kind of error by immediately exiting instead of allowing the memory access and continuing.
+
+
+### Functions
+- Rust code uses snake case as the conventional style for function and variable names.
+- Function definitions in Rust start with `fn` and have a set of parentheses after the function name. The curly brackets tell the compiler where the function body begins and ends.
+- Rust doesn’t care where you define your functions, only that they’re defined somewhere.
+- In function signatures, you must declare the type of each parameter. This is a deliberate decision in Rust’s design: requiring type annotations in function definitions means the compiler almost never needs you to use them elsewhere in the code to figure out what you mean.
+```rust
+fn another_function(x: i32, y: bool) {
+    println!("The value of x is: {}", x);
+    println!("The value of y is: {}", y);
+}
+
+fn plus_one(x: i32) -> i32 {
+    x + 1
+}
+```
+- `let y = 6;` is a statement. Statement does not return a value
+- Expressions evaluate to something and make up most of the rest of the code that you’ll write in Rust. Consider a simple math operation, such as `5 + 6`, which is an expression that evaluates to the value 11.
+```rust
+let x = 5;
+
+let y = {
+    let x = 3;
+    x + 1
+};
+
+println!("The value of y is: {}", y);  // 4
+```
+- Expressions do not include ending semicolons. If you add a semicolon to the end of an expression, you turn it into a statement, which will then not return a value. Keep this in mind as you explore function return values and expressions next.
+
+- In Rust, the return value of the function is synonymous with the value of the final expression in the block of the body of a function. You can return early from a function by using the `return` keyword and specifying a value, but most functions return the last expression implicitly.
+
+
+```rust
+fn plus_one(x: i32) -> i32 {
+    x + 1;
+}
+```
+- Compiling this code produces an error. The main error message, “mismatched types,” reveals the core issue with this code. The definition of the function plus_one says that it will return an i32, but statements don’t evaluate to a value, which is expressed by (), an empty tuple. Therefore, nothing is returned, which contradicts the function definition and results in an error. In this output, Rust provides a message to possibly help rectify this issue: it suggests removing the semicolon, which would fix the error.
+
+
+### Control Flow
+```rust
+fn main() {
+    let number = 3;
+
+    if number < 5 {
+        println!("condition was true");
+    } else {
+        println!("condition was false");
+    }
+}
+```
+
+- Blocks of code associated with the conditions in `if` expressions are sometimes called arms, just like the arms in `match` expressions.
+- It’s also worth noting that the condition in this code _must_ be a `bool`. If the condition isn’t a `bool`, we’ll get an error. For example, try running the following code:
+```rust
+let number = 3;
+
+if number {
+    println!("number was three");
+}
+```
+
+- Using too many `else if` expressions can clutter your code, so if you have more than one, you might want to refactor your code. Chapter 6 describes a powerful Rust branching construct called `match` for these cases.
+
+- Because `if` is an expression, we can use it on the right side of a `let` statement.
+```rust
+let condition = true;
+let number = if condition { 5 } else { 6 };         
+```
+- In the preceding code snippet, both if and else return expressions should return the same type. Otherwise, we will get an error during compile time.
+
+#### Repetition with Loops
+```rust
+// Infinite loop
+loop {
+    println!("again!");
+}
+
+
+//  Returning values from loops
+let mut counter = 0;
+// Result will be 20.
+let result = loop {
+    counter += 1;
+
+    if counter == 10 {
+        break counter * 2;
+    }
+};
+
+
+// Conditional Loops with while
+let mut number = 3;
+
+while number != 0 {
+    println!("{}!", number);
+
+    number -= 1;
+}
+
+
+// Looping Through a Collection with for
+let a = [10, 20, 30, 40, 50];
+for element in a.iter() {
+    println!("the value is: {}", element);
+}
+
+for number in (1..4).rev() {
+    println!("{}!", number);
+}
+```
+- The safety and conciseness of for loops make them the most commonly used loop construct in Rust.
